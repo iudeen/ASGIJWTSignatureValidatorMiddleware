@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jwt-signature-validator"
-version = "0.0.0"
+version = "0.0.1"
 description = "An ASGI Middleware to get payload from JWTs"
 authors = [
     { name = "Irfanuddin Shafi Ahmed", email = "irfanudeen08@gmail.com" },
