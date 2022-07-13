@@ -34,4 +34,3 @@ zip-safe = false
 [project.urls]
 Homepage = "https://github.com/iudeen/jwt-signature-validator"
 Source = "https://github.com/iudeen/jwt-signature-validator"
-Twitter = "https://twitter.com/marcelotryle"
