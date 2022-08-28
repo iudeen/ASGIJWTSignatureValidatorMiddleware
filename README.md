@@ -34,9 +34,9 @@ from pydantic import BaseModel
 app = FastAPI()
 
 app.add_middleware(
-    EncodedPayloadSignatureMiddleware, 
-    jwt_secret="hello", 
-    jwt_algorithms=["HS256"], 
+    EncodedPayloadSignatureMiddleware,
+    jwt_secret="hello",
+    jwt_algorithms=["HS256"],
     protect_hosts=["*"]
 )
 
