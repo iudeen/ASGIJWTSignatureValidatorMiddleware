@@ -12,7 +12,7 @@
         <img src="https://img.shields.io/pypi/v/jwt-signature-validator" alt="Package version">
     </a>
     <img src="https://img.shields.io/pypi/pyversions/jwt-signature-validator">
-    <img src="https://img.shields.io/github/license/iudeen/jwt-signature-validator">
+    <img src="https://img.shields.io/github/license/iudeen/ASGIJWTSignatureValidatorMiddleware">
 </p>
 
 JWT Signature Middleware is a pure ASGI Middleware that can be used with AGSI frameworks like FastAPI, Starlette and Sanic.
