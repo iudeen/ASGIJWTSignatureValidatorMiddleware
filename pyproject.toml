@@ -5,12 +5,15 @@ build-backend = "hatchling.build"
 [project]
 name = "jwt-signature-validator"
 description = "An ASGI Middleware to get payload from JWTs"
+readme = "README.md"
 authors = [
     { name = "Irfanuddin Shafi Ahmed", email = "irfanudeen08@gmail.com" },
 ]
 license = { text = "MIT" }
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+"pyjwt>=2.4.0"
+]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
