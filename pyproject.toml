@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "jwt-signature-validator"
-version = "0.0.3"
+version = "0.0.2"
 description = "An ASGI Middleware to get payload from JWTs"
 authors = [
     { name = "Irfanuddin Shafi Ahmed", email = "irfanudeen08@gmail.com" },
@@ -19,7 +19,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.9"
 ]
-dynamic = ["version"]
 
 [tool.setuptools]
 license-files = ["LICENSE"]
@@ -27,7 +26,6 @@ package-data = { "jwt_signature_validator" = ["py.typed"] }
 include-package-data = true
 zip-safe = false
 
-[tool.hatch]
 [project.urls]
 Homepage = "https://github.com/iudeen/jwt-signature-validator"
 Source = "https://github.com/iudeen/jwt-signature-validator"
