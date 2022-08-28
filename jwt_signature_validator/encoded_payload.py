@@ -1,13 +1,12 @@
-import json
 import logging
 
 try:
     import jwt
     from jwt.exceptions import (
-        InvalidSignatureError,
-        ExpiredSignatureError,
-        MissingRequiredClaimError,
         DecodeError,
+        ExpiredSignatureError,
+        InvalidSignatureError,
+        MissingRequiredClaimError,
     )
 except ImportError as JWTLibraryError:
     logging.warning("pyjwt not found. Run pip install pyjwt")
@@ -17,8 +16,14 @@ except ImportError as JWTLibraryError:
     MissingRequiredClaimError = None
     DecodeError = None
 
-from starlette.datastructures import MutableHeaders
-from starlette.types import Receive, Scope, Send
+try:
+    import ujson as json
+except ImportError:
+    import json
+
+from jwt_signature_validator.datastructures import MutableHeaders
+from jwt_signature_validator.exceptions import HTTPException
+from jwt_signature_validator.types import Receive, Scope, Send
 
 ENFORCE_DOMAIN_WILDCARD = "Domain wildcard patterns must be like '*.example.com'."
 
@@ -72,7 +77,9 @@ class EncodedPayloadSignatureMiddleware:
                 DecodeError,
             ) as inv_exp:
                 logging.error(inv_exp)
-                signature = {}
+                raise HTTPException(
+                    status_code=403, detail="Payload Tampered or Invalid!"
+                )
             signature = json.dumps(signature).encode()
             return {"type": receive_["type"], "body": signature, "more_body": False}
 
