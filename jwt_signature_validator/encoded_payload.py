@@ -69,9 +69,7 @@ class EncodedPayloadSignatureMiddleware:
 
             signature = bytes(signature).decode()
             try:
-                signature = jwt.decode(
-                    signature, self.jwt_secret, self.jwt_algorithms
-                )
+                signature = jwt.decode(signature, self.jwt_secret, self.jwt_algorithms)
             except (
                 InvalidSignatureError,
                 ExpiredSignatureError,

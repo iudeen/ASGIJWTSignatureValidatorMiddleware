@@ -129,7 +129,9 @@ class MutableHeaders(Headers):
         for idx in reversed(pop_indexes):
             del self._list[idx]
 
-    def __ior__(self, other: typing.Mapping[typing.Any, typing.Any]) -> "MutableHeaders":
+    def __ior__(
+        self, other: typing.Mapping[typing.Any, typing.Any]
+    ) -> "MutableHeaders":
         if not isinstance(other, typing.Mapping):
             raise TypeError(f"Expected a mapping but got {other.__class__.__name__}")
         self.update(other)

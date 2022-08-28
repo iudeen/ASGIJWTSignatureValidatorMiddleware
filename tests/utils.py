@@ -17,7 +17,7 @@ def encode_payload_modify(payload: dict[Any, Any], key: str, algorithm: str) -> 
 
 
 async def generate_large_data() -> dict[str, str]:
-    async def get_string(n: int = 10)->str:
+    async def get_string(n: int = 10) -> str:
         return "".join(random.choices(string.ascii_uppercase + string.digits, k=n))
 
     data = {}

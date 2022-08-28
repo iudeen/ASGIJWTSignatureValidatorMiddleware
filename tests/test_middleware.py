@@ -1,11 +1,12 @@
 import httpx
 import pytest
+
+from jwt_signature_validator import EncodedPayloadSignatureMiddleware
+from jwt_signature_validator.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.types import Receive, Scope, Send
 
-from jwt_signature_validator import EncodedPayloadSignatureMiddleware
-from jwt_signature_validator.exceptions import HTTPException
 from tests.utils import encode_payload, encode_payload_modify, generate_large_data
 
 

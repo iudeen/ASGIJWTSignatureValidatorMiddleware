@@ -1,5 +1,6 @@
 # mypy: ignore-errors
 
+
 class Response:
     charset = "utf-8"
 
