@@ -1,3 +1,5 @@
+# mypy: ignore-errors
+
 import logging
 
 try:
@@ -8,7 +10,7 @@ try:
         InvalidSignatureError,
         MissingRequiredClaimError,
     )
-except ImportError as JWTLibraryError:
+except ImportError:
     logging.warning("pyjwt not found. Run pip install pyjwt")
     jwt = None
     InvalidSignatureError = None
@@ -65,10 +67,10 @@ class EncodedPayloadSignatureMiddleware:
                 receive_ = await receive()
                 signature.extend(receive_["body"])
 
-            signature = bytes(signature)
+            signature = bytes(signature).decode()
             try:
                 signature = jwt.decode(
-                    signature, self.jwt_secret, algorithms=self.jwt_algorithms
+                    signature, self.jwt_secret, self.jwt_algorithms
                 )
             except (
                 InvalidSignatureError,

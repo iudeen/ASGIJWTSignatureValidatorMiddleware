@@ -1,31 +1,23 @@
 import random
 import string
+from typing import Any
 
 import jwt
-from starlette.types import Message
 
 
-async def mock_receive() -> Message:
-    raise NotImplementedError  # pragma: no cover
-
-
-async def mock_send(message: Message) -> None:
-    raise NotImplementedError  # pragma: no cover
-
-
-def encode_payload(payload: dict, key: str, algorithm: str):
+def encode_payload(payload: dict[Any, Any], key: str, algorithm: str) -> str:
     return jwt.encode(payload, key, algorithm)
 
 
-def encode_payload_modify(payload: dict, key: str, algorithm: str):
-    encoded_payload = jwt.encode(payload, key, algorithm)
-    encoded_payload = list(encoded_payload)
+def encode_payload_modify(payload: dict[Any, Any], key: str, algorithm: str) -> str:
+    _encoded_payload = jwt.encode(payload, key, algorithm)
+    encoded_payload = list(_encoded_payload)
     random.shuffle(encoded_payload)
     return "".join(encoded_payload)
 
 
-async def generate_large_data():
-    async def get_string(n: int = 10):
+async def generate_large_data() -> dict[str, str]:
+    async def get_string(n: int = 10)->str:
         return "".join(random.choices(string.ascii_uppercase + string.digits, k=n))
 
     data = {}
