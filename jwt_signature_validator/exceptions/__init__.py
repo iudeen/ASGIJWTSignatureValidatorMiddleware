@@ -1,8 +1,13 @@
 import http
 import typing
 
+try:
+    from fastapi.exceptions import HTTPException as FastAPIHTTPException
+except ImportError:
+    FastAPIHTTPException = Exception
 
-class HTTPException(Exception):
+
+class HTTPException(FastAPIHTTPException):
     def __init__(
         self,
         status_code: int,
@@ -14,6 +19,7 @@ class HTTPException(Exception):
         self.status_code = status_code
         self.detail = detail
         self.headers = headers
+        super().__init__(status_code=status_code, detail=detail, headers=headers)
 
     def __repr__(self) -> str:
         class_name = self.__class__.__name__
