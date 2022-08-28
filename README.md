@@ -1,11 +1,11 @@
 <h1 align="center">
-    <strong>jwt-signature-validator</strong>
+    <strong>JWT Signature Validator</strong>
 </h1>
 <p align="center">
     <a href="https://github.com/iudeen/jwt-signature-validator" target="_blank">
-        <img src="https://img.shields.io/github/last-commit/iudeen/jwt-signature-validator" alt="Latest Commit">
+        <img src="https://img.shields.io/github/last-commit/iudeen/ASGIJWTSignatureValidatorMiddleware" alt="Latest Commit">
     </a>
-        <img src="https://img.shields.io/github/workflow/status/iudeen/jwt-signature-validator/CI">
+        <img src="https://img.shields.io/github/workflow/status/iudeen/ASGIJWTSignatureValidatorMiddleware/CI">
         <img src="https://img.shields.io/codecov/c/github/iudeen/jwt-signature-validator">
     <br />
     <a href="https://pypi.org/project/jwt-signature-validator" target="_blank">
@@ -15,10 +15,40 @@
     <img src="https://img.shields.io/github/license/iudeen/jwt-signature-validator">
 </p>
 
+JWT Signature Middleware is a pure ASGI Middleware that can be used with AGSI frameworks like FastAPI, Starlette and Sanic.
+
+
 ## Installation
 
 ```bash
 pip install jwt-signature-validator
+```
+
+## Usage
+
+```python
+from fastapi import FastAPI
+from jwt_signature_validator import EncodedPayloadSignatureMiddleware
+from pydantic import BaseModel
+
+app = FastAPI()
+
+app.add_middleware(
+    EncodedPayloadSignatureMiddleware, 
+    jwt_secret="hello", 
+    jwt_algorithms=["HS256"], 
+    protect_hosts=["*"]
+)
+
+
+class Model(BaseModel):
+    text: str
+
+
+@app.post("/")
+def check(req: Model):
+    return req
+
 ```
 
 ## License
