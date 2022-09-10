@@ -35,5 +35,5 @@ mkdocs-material~=8.3.9
 setuptools~=65.3.0
 fastapi~=0.81
 pyjwt~=2.4.0
-starlette~=0.19.1
+starlette~=0.20.4
 ujson~=5.4.0
