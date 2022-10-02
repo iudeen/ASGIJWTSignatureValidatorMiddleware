@@ -86,7 +86,7 @@ class EncodedPayloadSignatureMiddleware:
         headers = MutableHeaders(scope=scope)
         if headers.get("Content-Type") is None:
             raise HTTPException(
-                    status_code=415, detail="Unsupported Content Type!"
+                    status_code=406, detail="Unacceptable Content Type!"
                 )
         if headers.get("Content-Type") == "application/json":
             host = headers.get("host", "").split(":")[0]
