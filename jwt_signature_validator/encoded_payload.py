@@ -88,7 +88,7 @@ class EncodedPayloadSignatureMiddleware:
             raise HTTPException(
                 status_code=406, detail="Unacceptable Content Type!"
             )
-        if headers.get("Content-Type") == "application/json":
+        elif headers.get("Content-Type") == "application/json":
             host = headers.get("host", "").split(":")[0]
             is_protected_host = False
             for pattern in self.protect_hosts:
