@@ -84,7 +84,9 @@ class EncodedPayloadSignatureMiddleware:
             return {"type": receive_["type"], "body": signature, "more_body": False}
 
         headers = MutableHeaders(scope=scope)
-        if headers.get("Content-Type") == "application/json":
+        if headers.get("Content-Type") is None:
+            raise HTTPException(status_code=406, detail="Unacceptable Content Type!")
+        elif headers.get("Content-Type") == "application/json":
             host = headers.get("host", "").split(":")[0]
             is_protected_host = False
             for pattern in self.protect_hosts:
