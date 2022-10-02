@@ -32,11 +32,11 @@ ENFORCE_DOMAIN_WILDCARD = "Domain wildcard patterns must be like '*.example.com'
 
 class EncodedPayloadSignatureMiddleware:
     def __init__(
-            self,
-            app,
-            jwt_secret: str,
-            jwt_algorithms: list[str],
-            protect_hosts: list = None,
+        self,
+        app,
+        jwt_secret: str,
+        jwt_algorithms: list[str],
+        protect_hosts: list = None,
     ):
         self.app = app
         self.protect_hosts = protect_hosts
@@ -71,10 +71,10 @@ class EncodedPayloadSignatureMiddleware:
             try:
                 signature = jwt.decode(signature, self.jwt_secret, self.jwt_algorithms)
             except (
-                    InvalidSignatureError,
-                    ExpiredSignatureError,
-                    MissingRequiredClaimError,
-                    DecodeError,
+                InvalidSignatureError,
+                ExpiredSignatureError,
+                MissingRequiredClaimError,
+                DecodeError,
             ) as inv_exp:
                 logging.error(inv_exp)
                 raise HTTPException(
@@ -85,15 +85,13 @@ class EncodedPayloadSignatureMiddleware:
 
         headers = MutableHeaders(scope=scope)
         if headers.get("Content-Type") is None:
-            raise HTTPException(
-                status_code=406, detail="Unacceptable Content Type!"
-            )
+            raise HTTPException(status_code=406, detail="Unacceptable Content Type!")
         elif headers.get("Content-Type") == "application/json":
             host = headers.get("host", "").split(":")[0]
             is_protected_host = False
             for pattern in self.protect_hosts:
                 if host == pattern or (
-                        pattern.startswith("*") and host.endswith(pattern[1:])
+                    pattern.startswith("*") and host.endswith(pattern[1:])
                 ):
                     is_protected_host = True
                     break
