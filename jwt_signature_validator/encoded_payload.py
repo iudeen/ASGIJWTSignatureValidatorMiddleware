@@ -42,6 +42,7 @@ class EncodedPayloadSignatureMiddleware:
         self.protect_hosts = protect_hosts
         self.jwt_secret = jwt_secret
         self.jwt_algorithms = jwt_algorithms
+        self.validate_request_types = ["POST", "PUT", "DELETE"]
         if not self.protect_hosts:
             self.protect_hosts = ["*"]
 
@@ -84,7 +85,10 @@ class EncodedPayloadSignatureMiddleware:
             return {"type": receive_["type"], "body": signature, "more_body": False}
 
         headers = MutableHeaders(scope=scope)
-        if headers.get("Content-Type") is None:
+        if (
+            headers.get("Content-Type") is None
+            and scope.get("method", "POST") in self.validate_request_types
+        ):
             raise HTTPException(status_code=406, detail="Unacceptable Content Type!")
         elif headers.get("Content-Type") == "application/json":
             host = headers.get("host", "").split(":")[0]
