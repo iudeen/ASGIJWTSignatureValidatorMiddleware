@@ -8,7 +8,6 @@ twine~=4.0.1
 build==0.8.0
 
 # Testing
-orjson<=3.8.1
 autoflake~=1.4
 black~=22.8.0
 flake8~=3.9.2

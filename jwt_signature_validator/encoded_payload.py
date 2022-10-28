@@ -19,7 +19,7 @@ except ImportError:
     DecodeError = None
 
 try:
-    import orjson as json
+    import ujson as json
 except ImportError:
     import json
 

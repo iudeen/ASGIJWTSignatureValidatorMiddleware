@@ -25,7 +25,7 @@ classifiers = [
 
 [project.optional-dependencies]
 all = [
-    "orjson<=3.8.1",
+    "ujson>=5.4.0",
     "fastapi>=0.79"
 ]
 fastapi=[
