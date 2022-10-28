@@ -35,12 +35,12 @@ ENFORCE_DOMAIN_WILDCARD = "Domain wildcard patterns must be like '*.example.com'
 
 class EncodedPayloadSignatureMiddleware:
     def __init__(
-            self,
-            app,
-            jwt_algorithms: list[str],
-            protect_hosts: list = None,
-            jwt_secret: Optional[str] = None,
-            secret_path: Union[str, None, "PathLike[str]"] = None
+        self,
+        app,
+        jwt_algorithms: list[str],
+        protect_hosts: list = None,
+        jwt_secret: Optional[str] = None,
+        secret_path: Union[str, None, "PathLike[str]"] = None,
     ):
         self.app = app
         self.protect_hosts = protect_hosts
@@ -75,10 +75,10 @@ class EncodedPayloadSignatureMiddleware:
             try:
                 return jwt.decode(signature, self.jwt_secret, self.jwt_algorithms)
             except (
-                    InvalidSignatureError,
-                    ExpiredSignatureError,
-                    MissingRequiredClaimError,
-                    DecodeError,
+                InvalidSignatureError,
+                ExpiredSignatureError,
+                MissingRequiredClaimError,
+                DecodeError,
             ) as inv_exp:
                 logging.error(inv_exp)
                 raise HTTPException(
@@ -103,7 +103,8 @@ class EncodedPayloadSignatureMiddleware:
             except Exception as e:
                 logging.error(e)
                 raise HTTPException(
-                    status_code=403, detail=f"Unable to authorize payload signature. Error: {e}"
+                    status_code=403,
+                    detail=f"Unable to authorize payload signature. Error: {e}",
                 )
 
         async def content_type_validation_failed():
@@ -112,8 +113,8 @@ class EncodedPayloadSignatureMiddleware:
         headers = MutableHeaders(scope=scope)
 
         if (
-                headers.get("Content-Type") in ["", None]
-                and scope.get("method", "POST") in self.validate_request_types
+            headers.get("Content-Type") in ["", None]
+            and scope.get("method", "POST") in self.validate_request_types
         ):
             await self.app(scope, content_type_validation_failed, send)
             return
@@ -121,9 +122,12 @@ class EncodedPayloadSignatureMiddleware:
             host = headers.get("host", "").split(":")[0]
             is_protected_host = False
             for pattern in self.protect_hosts:
-                if any([host == pattern,
-                        (pattern.startswith("*") and host.endswith(pattern[1:]))
-                        ]):
+                if any(
+                    [
+                        host == pattern,
+                        (pattern.startswith("*") and host.endswith(pattern[1:])),
+                    ]
+                ):
                     is_protected_host = True
                     break
             if is_protected_host:
