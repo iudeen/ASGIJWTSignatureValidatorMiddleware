@@ -1,6 +1,9 @@
 # mypy: ignore-errors
 
 import logging
+import pathlib
+from os import PathLike
+from typing import Optional, Union
 
 try:
     import jwt
@@ -34,14 +37,23 @@ class EncodedPayloadSignatureMiddleware:
     def __init__(
         self,
         app,
-        jwt_secret: str,
         jwt_algorithms: list[str],
         protect_hosts: list = None,
+        jwt_secret: Optional[str] = None,
+        secret_path: Union[str, None, "PathLike[str]"] = None,
     ):
         self.app = app
         self.protect_hosts = protect_hosts
-        self.jwt_secret = jwt_secret
+        if secret_path:
+            self.path = pathlib.Path(secret_path)
+            if not self.path.is_file():
+                raise FileExistsError
+            with open(self.path, "r") as secret_path_file:
+                self.jwt_secret = secret_path_file.read()
+        else:
+            self.jwt_secret = jwt_secret
         self.jwt_algorithms = jwt_algorithms
+        self.validate_request_types = ["POST", "PUT", "DELETE"]
         if not self.protect_hosts:
             self.protect_hosts = ["*"]
 
@@ -59,17 +71,9 @@ class EncodedPayloadSignatureMiddleware:
 
             return await self.app(scope, receive, send)
 
-        async def verify_signature():
-            receive_ = await receive()
-            signature = bytearray()
-            signature.extend(receive_.get("body"))
-            while receive_["more_body"]:
-                receive_ = await receive()
-                signature.extend(receive_["body"])
-
-            signature = bytes(signature).decode()
+        async def decode_jwt(signature):
             try:
-                signature = jwt.decode(signature, self.jwt_secret, self.jwt_algorithms)
+                return jwt.decode(signature, self.jwt_secret, self.jwt_algorithms)
             except (
                 InvalidSignatureError,
                 ExpiredSignatureError,
@@ -80,16 +84,49 @@ class EncodedPayloadSignatureMiddleware:
                 raise HTTPException(
                     status_code=403, detail="Payload Tampered or Invalid!"
                 )
-            signature = json.dumps(signature).encode()
-            return {"type": receive_["type"], "body": signature, "more_body": False}
+
+        async def verify_signature():
+            try:
+                receive_ = await receive()
+                signature = bytearray()
+                signature.extend(receive_.get("body"))
+                while receive_["more_body"]:
+                    receive_ = await receive()
+                    signature.extend(receive_["body"])
+
+                signature = bytes(signature).decode()
+                decoded_signature = await decode_jwt(signature)
+                _payload = json.dumps(decoded_signature).encode()
+                return {"type": receive_["type"], "body": _payload, "more_body": False}
+            except HTTPException:
+                raise
+            except Exception as e:
+                logging.error(e)
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Unable to authorize payload signature. Error: {e}",
+                )
+
+        async def content_type_validation_failed():
+            raise HTTPException(status_code=406, detail="Unacceptable Content Type!")
 
         headers = MutableHeaders(scope=scope)
-        if headers.get("Content-Type") == "application/json":
+
+        if (
+            headers.get("Content-Type") in ["", None]
+            and scope.get("method", "POST") in self.validate_request_types
+        ):
+            await self.app(scope, content_type_validation_failed, send)
+            return
+        elif headers.get("Content-Type") == "application/json":
             host = headers.get("host", "").split(":")[0]
             is_protected_host = False
             for pattern in self.protect_hosts:
-                if host == pattern or (
-                    pattern.startswith("*") and host.endswith(pattern[1:])
+                if any(
+                    [
+                        host == pattern,
+                        (pattern.startswith("*") and host.endswith(pattern[1:])),
+                    ]
                 ):
                     is_protected_host = True
                     break
