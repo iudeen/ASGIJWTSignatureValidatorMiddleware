@@ -1,7 +1,7 @@
 -e .[all]
 
 # Type annotation
-asgiref~=3.5.2
+asgiref~=3.11.0
 
 # Packaging
 twine~=4.0.1
