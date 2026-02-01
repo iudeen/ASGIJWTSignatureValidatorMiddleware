@@ -8,18 +8,15 @@ class Headers(typing.Mapping[str, str]):
 
     def __init__(
         self,
-        headers: typing.Optional[typing.Mapping[str, str]] = None,
-        raw: typing.Optional[typing.List[typing.Tuple[bytes, bytes]]] = None,
-        scope: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+        headers: typing.Mapping[str, str] | None = None,
+        raw: list[tuple[bytes, bytes]] | None = None,
+        scope: typing.Mapping[str, typing.Any] | None = None,
     ) -> None:
-        self._list: typing.List[typing.Tuple[bytes, bytes]] = []
+        self._list: list[tuple[bytes, bytes]] = []
         if headers is not None:
             assert raw is None, 'Cannot set both "headers" and "raw".'
             assert scope is None, 'Cannot set both "headers" and "scope".'
-            self._list = [
-                (key.lower().encode("latin-1"), value.encode("latin-1"))
-                for key, value in headers.items()
-            ]
+            self._list = [(key.lower().encode("latin-1"), value.encode("latin-1")) for key, value in headers.items()]
         elif raw is not None:
             assert scope is None, 'Cannot set both "raw" and "scope".'
             self._list = raw
@@ -27,20 +24,17 @@ class Headers(typing.Mapping[str, str]):
             self._list = scope["headers"]
 
     @property
-    def raw(self) -> typing.List[typing.Tuple[bytes, bytes]]:
+    def raw(self) -> list[tuple[bytes, bytes]]:
         return list(self._list)
 
-    def keys(self) -> typing.List[str]:  # type: ignore
+    def keys(self) -> list[str]:  # type: ignore
         return [key.decode("latin-1") for key, value in self._list]
 
-    def values(self) -> typing.List[str]:  # type: ignore
+    def values(self) -> list[str]:  # type: ignore
         return [value.decode("latin-1") for key, value in self._list]
 
-    def items(self) -> typing.List[typing.Tuple[str, str]]:  # type: ignore
-        return [
-            (key.decode("latin-1"), value.decode("latin-1"))
-            for key, value in self._list
-        ]
+    def items(self) -> list[tuple[str, str]]:  # type: ignore
+        return [(key.decode("latin-1"), value.decode("latin-1")) for key, value in self._list]
 
     def get(self, key: str, default: typing.Any = None) -> typing.Any:
         try:
@@ -48,13 +42,9 @@ class Headers(typing.Mapping[str, str]):
         except KeyError:
             return default
 
-    def getlist(self, key: str) -> typing.List[str]:
+    def getlist(self, key: str) -> list[str]:
         get_header_key = key.lower().encode("latin-1")
-        return [
-            item_value.decode("latin-1")
-            for item_key, item_value in self._list
-            if item_key == get_header_key
-        ]
+        return [item_value.decode("latin-1") for item_key, item_value in self._list if item_key == get_header_key]
 
     def mutablecopy(self) -> "MutableHeaders":
         return MutableHeaders(raw=self._list[:])
@@ -129,9 +119,7 @@ class MutableHeaders(Headers):
         for idx in reversed(pop_indexes):
             del self._list[idx]
 
-    def __ior__(
-        self, other: typing.Mapping[typing.Any, typing.Any]
-    ) -> "MutableHeaders":
+    def __ior__(self, other: typing.Mapping[typing.Any, typing.Any]) -> "MutableHeaders":
         if not isinstance(other, typing.Mapping):
             raise TypeError(f"Expected a mapping but got {other.__class__.__name__}")
         self.update(other)
@@ -145,7 +133,7 @@ class MutableHeaders(Headers):
         return new
 
     @property
-    def raw(self) -> typing.List[typing.Tuple[bytes, bytes]]:
+    def raw(self) -> list[tuple[bytes, bytes]]:
         return self._list
 
     def setdefault(self, key: str, value: str) -> str:

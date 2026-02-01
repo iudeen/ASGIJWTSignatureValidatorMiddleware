@@ -5,5 +5,5 @@ help: ## Show this help
 .PHONY: publish
 publish:  ## Publish release to PyPI
 	@echo "🔖 Publish to PyPI"
-	python -m build
+	scripts/build
 	twine upload dist/*

@@ -3,7 +3,7 @@
 import logging
 import pathlib
 from os import PathLike
-from typing import Optional, Union
+from typing import Union
 
 try:
     import jwt
@@ -39,7 +39,7 @@ class EncodedPayloadSignatureMiddleware:
         app,
         jwt_algorithms: list[str],
         protect_hosts: list = None,
-        jwt_secret: Optional[str] = None,
+        jwt_secret: str | None = None,
         secret_path: Union[str, None, "PathLike[str]"] = None,
     ):
         self.app = app
@@ -48,7 +48,7 @@ class EncodedPayloadSignatureMiddleware:
             self.path = pathlib.Path(secret_path)
             if not self.path.is_file():
                 raise FileExistsError
-            with open(self.path, "r") as secret_path_file:
+            with open(self.path) as secret_path_file:
                 self.jwt_secret = secret_path_file.read()
         else:
             self.jwt_secret = jwt_secret
@@ -81,9 +81,7 @@ class EncodedPayloadSignatureMiddleware:
                 DecodeError,
             ) as inv_exp:
                 logging.error(inv_exp)
-                raise HTTPException(
-                    status_code=403, detail="Payload Tampered or Invalid!"
-                )
+                raise HTTPException(status_code=403, detail="Payload Tampered or Invalid!")
 
         async def verify_signature():
             try:
@@ -112,10 +110,7 @@ class EncodedPayloadSignatureMiddleware:
 
         headers = MutableHeaders(scope=scope)
 
-        if (
-            headers.get("Content-Type") in ["", None]
-            and scope.get("method", "POST") in self.validate_request_types
-        ):
+        if headers.get("Content-Type") in ["", None] and scope.get("method", "POST") in self.validate_request_types:
             await self.app(scope, content_type_validation_failed, send)
             return
         elif headers.get("Content-Type") == "application/json":

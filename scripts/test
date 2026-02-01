@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -ex
+
+if [ -z $GITHUB_ACTIONS ]; then
+    scripts/check
+fi
+
+uv run coverage run -m pytest $@
+
+if [ -z $GITHUB_ACTIONS ]; then
+    scripts/coverage
+fi

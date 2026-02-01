@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+export SOURCE_FILES="jwt_signature_validator tests"
+
+set -x
+
+uv run ruff format $SOURCE_FILES
+uv run ruff check --fix $SOURCE_FILES

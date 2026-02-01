@@ -17,10 +17,7 @@ class Response:
             {
                 "type": "http.response.start",
                 "status": self.status_code,
-                "headers": [
-                    [key.encode(), value.encode()]
-                    for key, value in self.headers.items()
-                ],
+                "headers": [[key.encode(), value.encode()] for key, value in self.headers.items()],
             }
         )
         await send({"type": "http.response.body", "body": self.body})
