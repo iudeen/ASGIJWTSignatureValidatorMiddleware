@@ -4,64 +4,98 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jwt-signature-validator"
-description = "An ASGI Middleware to get payload from JWTs"
-readme = "README.md"
-authors = [
-    { name = "Irfanuddin Shafi Ahmed", email = "irfanudeen08@gmail.com" },
-]
-license = { text = "MIT" }
-requires-python = ">=3.9"
-dependencies = [
-"pyjwt>=2.4.0"
-]
 dynamic = ["version"]
+description = "An ASGI Middleware to sign payload using JWT"
+requires-python = ">=3.10"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.md"]
+
+authors = [{ name = "Irfanuddin Shafi Ahmed", email = "irfanudeen08@gmail.com" }]
+
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.9"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Internet :: WWW/HTTP",
 ]
 
-[project.optional-dependencies]
-all = [
-    "ujson>=5.4.0",
-    "fastapi>=0.79"
-]
-fastapi=[
-    "fastapi>=0.79"
-]
-
-
-[tool.setuptools]
-license-files = ["LICENSE"]
-package-data = { "jwt_signature_validator" = ["py.typed"] }
-include-package-data = true
-zip-safe = false
-
-[tool.hatch.envs.test]
 dependencies = [
-  "coverage[toml]",
-  "pytest",
-  "pytest-cov",
-  "pytest-mock",
+    "fastapi>=0.128.0",
+    "pyjwt>=2.11.0"
 ]
-[tool.hatch.envs.test.scripts]
-run-coverage = "pytest --cov-config=pyproject.toml --cov=pkg --cov=tests"
-run = "run-coverage --no-cov"
 
 [tool.hatch.version]
-path = "jwt_signature_validator/__about__.py"
+path = "jwt_signature_validator/__init__.py"
 
 [tool.hatch.build.targets.sdist]
-exclude = [
-  "/.github",
-  "/docs",
+include = ["/jwt_signature_validator", "/tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "FA", "UP"]
+ignore = ["B904", "B028", "UP031"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.mypy]
+warn_unused_ignores = true
+warn_redundant_casts = true
+show_error_codes = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+follow_imports = "silent"
+
+[tool.coverage.run]
+parallel = true
+source_pkgs = ["jwt_signature_validator", "tests"]
+plugins = ["coverage_conditional_plugin"]
+
+[tool.coverage.coverage_conditional_plugin.rules]
+rules = []
+
+[tool.coverage.report]
+precision = 2
+fail_under = 100
+show_missing = true
+skip_covered = true
+exclude_lines = [
+    "pragma: no cover",
+    "pragma: nocover",
+    "pragma: full coverage",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    "raise NotImplementedError",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["jwt_signature_validator"]
 
-[project.urls]
-Homepage = "https://github.com/iudeen/ASGIJWTSignatureValidatorMiddleware"
-Source = "https://github.com/iudeen/ASGIJWTSignatureValidatorMiddleware"
+[dependency-groups]
+dev = [
+    "asgiref>=3.11.0",
+    "autoflake>=2.3.1",
+    "coverage>=7.13.2",
+    "coverage-conditional-plugin>=0.9.0",
+    "cryptography>=46.0.4",
+    "flake8>=7.3.0",
+    "httpx>=0.28.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.1",
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.14.14",
+    "trustme>=1.2.1",
+    "twine>=6.2.0",
+    "types-click>=7.1.8",
+]
