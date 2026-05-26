@@ -58,9 +58,11 @@ class EncodedPayloadSignatureMiddleware:
             self.protect_hosts = ["*"]
 
         for _pattern in self.protect_hosts:
-            assert "*" not in _pattern[1:], ENFORCE_DOMAIN_WILDCARD
+            if "*" in _pattern[1:]:
+                raise AssertionError(ENFORCE_DOMAIN_WILDCARD)
             if _pattern.startswith("*") and _pattern != "*":
-                assert _pattern.startswith("*."), ENFORCE_DOMAIN_WILDCARD
+                if not _pattern.startswith("*."):
+                    raise AssertionError(ENFORCE_DOMAIN_WILDCARD)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
@@ -73,7 +75,7 @@ class EncodedPayloadSignatureMiddleware:
 
         async def decode_jwt(signature):
             try:
-                return jwt.decode(signature, self.jwt_secret, self.jwt_algorithms)
+                return jwt.decode(signature, self.jwt_secret, algorithms=self.jwt_algorithms)
             except (
                 InvalidSignatureError,
                 ExpiredSignatureError,
@@ -110,10 +112,13 @@ class EncodedPayloadSignatureMiddleware:
 
         headers = MutableHeaders(scope=scope)
 
-        if headers.get("Content-Type") in ["", None] and scope.get("method", "POST") in self.validate_request_types:
+        content_type = headers.get("content-type")
+        content_media_type = content_type.split(";", 1)[0].strip().lower() if content_type else None
+
+        if content_media_type in ["", None] and scope.get("method", "POST") in self.validate_request_types:
             await self.app(scope, content_type_validation_failed, send)
             return
-        elif headers.get("Content-Type") == "application/json":
+        elif content_media_type == "application/json":
             host = headers.get("host", "").split(":")[0]
             is_protected_host = False
             for pattern in self.protect_hosts:

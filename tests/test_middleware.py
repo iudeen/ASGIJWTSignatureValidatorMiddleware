@@ -71,6 +71,26 @@ async def test_protected_request_success() -> None:
 
 
 @pytest.mark.asyncio
+async def test_protected_request_success_with_charset_content_type() -> None:
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:
+        request = Request(scope, receive=receive)
+        data = await request.json()
+        response = JSONResponse(data)
+        await response(scope, receive, send)
+
+    app = EncodedPayloadSignatureMiddleware(
+        app, jwt_secret="hello" * 100, jwt_algorithms=["HS256"], protect_hosts=["testserver"]
+    )
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        body = {"test": "test"}
+        encoded_body = encode_payload(body, "hello" * 100, "HS256")
+        r = await client.post("/", content=encoded_body, headers={"content-type": "application/json; charset=utf-8"})
+        assert r.status_code == 200
+        assert r.json() == body
+
+
+@pytest.mark.asyncio
 async def test_protected_request_tampered() -> None:
     async def app(scope: Scope, receive: Receive, send: Send) -> None:
         request = Request(scope, receive=receive)
