@@ -113,6 +113,8 @@ class EncodedPayloadSignatureMiddleware:
         headers = MutableHeaders(scope=scope)
 
         content_type = headers.get("content-type")
+        if not isinstance(content_type, str):
+            content_type = None
         content_media_type = content_type.split(";", 1)[0].strip().lower() if content_type else None
 
         if content_media_type in ["", None] and scope.get("method", "POST") in self.validate_request_types:
